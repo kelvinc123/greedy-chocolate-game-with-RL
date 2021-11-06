@@ -11,29 +11,36 @@ MIN_CHOCOLATE = 3
 VERBOSE=True
 
 class GreedyChocolateGame:
+    '''
+    Greedy chocolate game class
+    '''
 
     def __init__(self, SECTION, MAX_CHOCOLATE, MIN_CHOCOLATE, VERBOSE):
 
-        # setting 
+        # settings
         self.section = SECTION
         self.max_chocolate = MAX_CHOCOLATE
         self.min_chocolate = MIN_CHOCOLATE
         self.verbose = VERBOSE
+        if VERBOSE:
+            self.print_init() 
         self.reset()
 
-
+    ################
+    ## Game logic ##
+    ################
     def reset(self):
         '''
-        Reset function to restart the game
+        Reset function to restart the game, reinitialize the state
         '''
+
+        if self.verbose:
+            print("\nNew Game")
 
         # initialize chocolate boxes
         self.boxes = np.random.randint(
             low=self.min_chocolate, high=self.max_chocolate+1, size=self.section
         )
-
-        if VERBOSE:
-            self.print_init()
 
         self.turn = "Player 1"
 
@@ -42,6 +49,7 @@ class GreedyChocolateGame:
         Play function
         '''
 
+        # Check if play versus human
         if VERBOSE and not action:
 
             # Print current chocolates
@@ -62,11 +70,41 @@ class GreedyChocolateGame:
         # check the winner
         done = self.check_greedy()
 
-        if VERBOSE and done:
+        if self.verbose and done:
             self.notify_winner()
+
+        self.change_player()
 
         return done
 
+    def take_chocolate(self, action):
+        '''
+        Function to take chocolate in a box
+        '''
+        self.boxes[action[0]] -= action[1]
+    
+    def check_greedy(self):
+        '''
+        Function to check if it's game over
+        '''
+        done = False
+        if np.sum(self.boxes) == 0:
+            done = True
+
+        return done
+
+    def change_player(self):
+        '''
+        Function to change player
+        '''
+        if self.turn == "Player 1":
+            self.turn = "Player 2"
+        else:
+            self.turn = "Player 1"
+
+    ###################
+    ## Print methods ##
+    ###################
     def print_init(self):
         '''
         Print function for game instruction
@@ -79,6 +117,31 @@ class GreedyChocolateGame:
         print("Just don't be the person to take the last chocolate!");
         print("\n================================================================")
 
+    def print_state(self):
+        '''
+        Function to print the current chocolates in all boxes
+        '''
+
+        print("\n\n\nChocolate box:\n")
+        for i in range(len(self.boxes)):
+            print(f"Box {i+1}: {self.boxes[i]}")
+
+    def print_take_chocolate(self, box_choice, num_chocolate):
+        '''
+        Function to print how many chocolate is taken
+        '''
+        print(f"\nTaking {num_chocolate} chocolates from box {box_choice+1}...")
+
+    def notify_winner(self):
+        '''
+        Function to print the loser
+        '''
+        print("\nYou take the last chocolate!")
+        print(f"{self.turn} is greedy :(")
+
+    #################
+    ## Interaction ##
+    #################
     def ask_box(self):
         '''
         Function to ask which box to take
@@ -112,7 +175,7 @@ class GreedyChocolateGame:
         '''
         
         while True:
-
+            # Ask how many chocolate to take
             num_chocolate = input(f"How many chocolates to take from box {box_choice+1}: ")
             if num_chocolate == "q":
                 sys.exit()
@@ -131,54 +194,6 @@ class GreedyChocolateGame:
                 break
 
         return num_chocolate
-
-
-    def print_state(self):
-        '''
-        Function to print the current chocolates in all boxes
-        '''
-
-        print("\n\n\nChocolate box:\n")
-        for i in range(len(self.boxes)):
-            print(f"Box {i+1}: {self.boxes[i]}")
-
-    def print_take_chocolate(self, box_choice, num_chocolate):
-        '''
-        Function to print how many chocolate is taken
-        '''
-        print(f"\nTaking {num_chocolate} chocolates from box {box_choice+1}...")
-
-    def notify_winner(self):
-        '''
-        Function to print the loser
-        '''
-        print("\nYou take the last chocolate!")
-        print(f"{self.turn} is greedy :(")
-
-    def take_chocolate(self, action):
-        '''
-        Function to take chocolate in a box
-        '''
-        self.boxes[action[0]] -= action[1]
-    
-    def check_greedy(self):
-        '''
-        Function to check if it's game over
-        '''
-        done = False
-        if np.sum(self.boxes) == 0:
-            done = True
-
-        return done
-
-    def change_player(self):
-        '''
-        Function to change player
-        '''
-        if self.turn == "Player 1":
-            self.turn = "Player 2"
-        else:
-            self.turn = "Player 1"
 
 if __name__ == "__main__":
 

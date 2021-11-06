@@ -16,7 +16,7 @@ class Environment:
         
     @property
     def state(self):
-        return self.game.boxes
+        return list(self.game.boxes)
 
     def get_possible_action(self):
         '''
@@ -48,6 +48,7 @@ class Environment:
         Input: action -> list of moves
         Output: next_state, reward, done
         '''
+        action = action.copy()
         action[0] -= 1
         done = self.game.play(action)
 
@@ -67,5 +68,12 @@ class Environment:
 if __name__ == "__main__":
 
     env = Environment(SECTION, MAX_CHOCOLATE, MIN_CHOCOLATE)
+    print(f"\nSample state (env.state): {env.state}")
+    print("\nSample possible action (env.get_possible_action())" + 
+        f": {env.get_possible_action()}")
+    print(f"\nSample action taken (env.get_possible_action[0])" +
+        f": {env.get_possible_action()[0]}")
+    print(f"\nSample step using previous action (env.step(action))" +
+        f"-> (next state, reward, done): {env.step(env.get_possible_action()[0])}")
 
 
