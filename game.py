@@ -2,6 +2,7 @@
 # imports
 import numpy as np
 import sys
+import os
 
 # config
 SECTION = 3
@@ -34,42 +35,45 @@ class GreedyChocolateGame:
         Reset function to restart the game, reinitialize the state
         '''
 
-        if self.verbose:
-            print("\nNew Game")
+        # if self.verbose:
+            # print("\nNew Game")
 
         # initialize chocolate boxes
         self.boxes = np.random.randint(
             low=self.min_chocolate, high=self.max_chocolate+1, size=self.section
         )
 
-        self.turn = "Player 1"
+        self.player = "Player 1"
 
     def play(self, action=None):
         '''
         Play function
         '''
 
-        # Check if play versus human
-        if VERBOSE and not action:
-
+        if self.verbose:
             # Print current chocolates
             self.print_state()
 
-            # Ask for user's input
-            box_choice = self.ask_box()
+            # Check if play versus human, action will be selected by human
+            if action == None:
 
-            chocolate_num = self.ask_chocolate(box_choice)
+                # Ask for user's input
+                box_choice = self.ask_box()
+                chocolate_num = self.ask_chocolate(box_choice)
 
-            self.print_take_chocolate(box_choice, chocolate_num)
+                # Get action list
+                action = [box_choice, chocolate_num]
 
-            action = [box_choice, chocolate_num]
+            # Notify turn
+            self.print_take_chocolate(action[0], action[1])
 
-        # take the chocolate
+        # Take the chocolate
         self.take_chocolate(action)
 
-        # check the winner
+        # Check the winner
         done = self.check_greedy()
 
+        # Notify winner
         if self.verbose and done:
             self.notify_winner()
 
@@ -97,10 +101,10 @@ class GreedyChocolateGame:
         '''
         Function to change player
         '''
-        if self.turn == "Player 1":
-            self.turn = "Player 2"
+        if self.player == "Player 1":
+            self.player = "Player 2"
         else:
-            self.turn = "Player 1"
+            self.player = "Player 1"
 
     ###################
     ## Print methods ##
@@ -121,8 +125,8 @@ class GreedyChocolateGame:
         '''
         Function to print the current chocolates in all boxes
         '''
-
-        print("\n\n\nChocolate box:\n")
+        print("\n----------------------------------------------------------------")
+        print("\n\nChocolate box:\n")
         for i in range(len(self.boxes)):
             print(f"Box {i+1}: {self.boxes[i]}")
 
@@ -130,14 +134,14 @@ class GreedyChocolateGame:
         '''
         Function to print how many chocolate is taken
         '''
-        print(f"\nTaking {num_chocolate} chocolates from box {box_choice+1}...")
+        print(f"\n{self.player}: take {num_chocolate} chocolates from box {box_choice+1}...")
 
     def notify_winner(self):
         '''
         Function to print the loser
         '''
-        print("\nYou take the last chocolate!")
-        print(f"{self.turn} is greedy :(")
+        print(f"\n{self.player} take the last chocolate!")
+        print(f"{self.player} is greedy :(")
 
     #################
     ## Interaction ##
@@ -149,7 +153,7 @@ class GreedyChocolateGame:
 
         while True:
 
-            box_choice = input(f"\n{self.turn} turn.\nPick a chocolate box: ")
+            box_choice = input(f"\n{self.player} turn.\nPick a chocolate box: ")
 
             if box_choice == "q":
                 sys.exit()
@@ -197,13 +201,66 @@ class GreedyChocolateGame:
 
 if __name__ == "__main__":
 
-    game = GreedyChocolateGame(SECTION, MAX_CHOCOLATE, MIN_CHOCOLATE, VERBOSE)
-    game.reset()
+    # config
+    SECTION = 3
+    MAX_CHOCOLATE = 20
+    MIN_CHOCOLATE = 3
 
-    while True:
-        done = game.play()
+    VERBOSE=True
 
-        if done == True:
-            break
+    # vs agent
+    if len(sys.argv) == 3:
+        if sys.argv[1] == "vs_agent":
 
-        game.change_player()
+            if sys.argv[2] == "--random":
+                # Create random agent
+                from agent.base_agent import RandomAgent
+                agent = RandomAgent()
+            elif sys.argv[2] == "--best":
+                # Create best agent
+                from agent.td_agent import QLearningAgent
+                agent = QLearningAgent(0, 0, 1)
+                # Load model of the current best model
+                filepath = os.path.join(
+                    "model",
+                    f"qagent_self_play_{SECTION}_{MIN_CHOCOLATE}_{MAX_CHOCOLATE}.npy"
+                )
+                agent.load_model(filepath)
+            else:
+                print("ERROR! vs_agent argument only have --random and --best parameters")
+                exit(1)
+
+            # Create new game
+            game = GreedyChocolateGame(SECTION, MAX_CHOCOLATE, MIN_CHOCOLATE, VERBOSE)
+            game.reset()
+
+            # Set learning mode off
+            agent.learning_mode_off()
+
+            # Play the game
+            while True:
+                ################
+                ## Human turn ##
+                ################
+                done = game.play()
+                if done:
+                    break
+                ################
+                ## Agent turn ##
+                ################
+                agent_action = agent.get_action(list(game.boxes))
+                agent_action[0] -= 1
+                done = game.play(agent_action)
+                if done:
+                    break
+
+    else:
+        print("\nPlaying 2 player games\n")
+        game = GreedyChocolateGame(SECTION, MAX_CHOCOLATE, MIN_CHOCOLATE, VERBOSE)
+        game.reset()
+
+        while True:
+            done = game.play()
+
+            if done == True:
+                break
