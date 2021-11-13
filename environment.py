@@ -11,8 +11,8 @@ MIN_CHOCOLATE = 3
 
 class Environment:
 
-    def __init__(self, SECTION, MAX_CHOCOLATE, MIN_CHOCOLATE):
-        self.game = GreedyChocolateGame(SECTION, MAX_CHOCOLATE, MIN_CHOCOLATE, False)
+    def __init__(self, SECTION, MIN_CHOCOLATE, MAX_CHOCOLATE):
+        self.game = GreedyChocolateGame(SECTION, MIN_CHOCOLATE, MAX_CHOCOLATE, False)
         
     @property
     def state(self):

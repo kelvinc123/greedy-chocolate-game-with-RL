@@ -16,12 +16,12 @@ class GreedyChocolateGame:
     Greedy chocolate game class
     '''
 
-    def __init__(self, SECTION, MAX_CHOCOLATE, MIN_CHOCOLATE, VERBOSE):
+    def __init__(self, SECTION, MIN_CHOCOLATE, MAX_CHOCOLATE, VERBOSE):
 
         # settings
         self.section = SECTION
-        self.max_chocolate = MAX_CHOCOLATE
         self.min_chocolate = MIN_CHOCOLATE
+        self.max_chocolate = MAX_CHOCOLATE
         self.verbose = VERBOSE
         if VERBOSE:
             self.print_init() 
@@ -114,11 +114,11 @@ class GreedyChocolateGame:
         Print function for game instruction
         '''
         print("\n\n================================================================")
-        print("\nWelcome to greedy test game!\n");
-        print("\nPeople avoid taking the last chocolate because");
-        print("it's a sign of greediness.\n\nYou can take any chocolates in a box");
-        print("(as long as it's sufficient).\n");
-        print("Just don't be the person to take the last chocolate!");
+        print("\nWelcome to greedy test game!\n")
+        print("\nPeople avoid taking the last chocolate because")
+        print("it's a sign of greediness.\n\nYou can take any chocolates in a box")
+        print("(as long as it's sufficient).\n")
+        print("Just don't be the person to take the last chocolate!")
         print("\n================================================================")
 
     def print_state(self):
@@ -211,7 +211,6 @@ if __name__ == "__main__":
     # vs agent
     if len(sys.argv) == 3:
         if sys.argv[1] == "vs_agent":
-
             if sys.argv[2] == "--random":
                 # Create random agent
                 from agent.base_agent import RandomAgent
@@ -231,7 +230,7 @@ if __name__ == "__main__":
                 exit(1)
 
             # Create new game
-            game = GreedyChocolateGame(SECTION, MAX_CHOCOLATE, MIN_CHOCOLATE, VERBOSE)
+            game = GreedyChocolateGame(SECTION, MIN_CHOCOLATE, MAX_CHOCOLATE, VERBOSE)
             game.reset()
 
             # Set learning mode off
@@ -256,7 +255,7 @@ if __name__ == "__main__":
 
     else:
         print("\nPlaying 2 player games\n")
-        game = GreedyChocolateGame(SECTION, MAX_CHOCOLATE, MIN_CHOCOLATE, VERBOSE)
+        game = GreedyChocolateGame(SECTION, MIN_CHOCOLATE, MAX_CHOCOLATE, VERBOSE)
         game.reset()
 
         while True:

@@ -1,9 +1,12 @@
-import numpy as np
+
 from environment import MAX_CHOCOLATE, MIN_CHOCOLATE, Environment
 from agent.td_agent import QLearningAgent
 from agent.td_agent import ExpectedSarsaAgent
 from agent.base_agent import RandomAgent
 
+import matplotlib.pyplot as plt
+import numpy as np
+from IPython import display
 
 class TwoPlayerGameTrainer:
     '''
@@ -16,23 +19,33 @@ class TwoPlayerGameTrainer:
     '''
 
     @staticmethod
-    def play(env, agent1, agent2):
+    def play(env, agent1, agent2, reset=True, verbose=True):
         '''
         Agent 1 vs agent 2 play for observation
         Input:
             env: Environment object : environment of the game
             agent1: RL Agent : Instantiate of RL agent
             agent2: RL Agent : Instantiate of RL agent
+            reset: Boolean : Indicates whether the environment is reset
+            verbose: Boolean : Indicates whether the game info is printed
+        Output:
+            winner: Integer : 1 if agent 1 wins, otherwise -1
         '''
 
         agent1.learning_mode_off()
         agent2.learning_mode_off()
 
         # Print game output
-        env.game.verbose = True
+        if verbose:
+            env.game.verbose = True
+        else:
+            env.game.verbose = False
 
         # Reset environment
-        s = env.reset()
+        if reset:
+            s = env.reset()
+        else:
+            s = env.state
 
         done = False
         while True:
@@ -44,7 +57,7 @@ class TwoPlayerGameTrainer:
             next_s, _, done = env.step(a)  # Step
 
             if done:
-                break
+                return -1
             
             ##################
             ## Agent 2 turn ##
@@ -53,12 +66,12 @@ class TwoPlayerGameTrainer:
             next_s, _, done = env.step(a)  # Step
 
             if done:
-                break
+                return 1
 
             s = next_s
 
     @staticmethod
-    def play_and_train(env, agent1, agent2, n_games=10000, learn=True):
+    def play_and_train(env, agent1, agent2, n_games=10000, learn=True, verbose=True):
         '''
         Run a full game using two agents. Agent 1 can be set to learn, while agent 2
         can only play. This is necessary to make the environment fixed.
@@ -100,7 +113,8 @@ class TwoPlayerGameTrainer:
 
         # Loop until termination
         for t in range(n_games):
-            print(f"Running game: {t+1}", end='\r')
+            if verbose:
+                print(f"Running game: {t+1}", end='\r')
             
             # Get the initial state
             s = env.reset()
@@ -156,7 +170,7 @@ class TwoPlayerGameTrainer:
         return game_history, (n_wins/n_games)
 
     @staticmethod
-    def self_play(env, agent, n_games=10000, iteration=20):
+    def self_play(env, agent, n_games=10000, iteration=20, plot_output=True):
         '''
         Method to train agent by self play
         Input:
@@ -169,6 +183,9 @@ class TwoPlayerGameTrainer:
         '''
     
         env.game.verbose = False  # Omit game output
+
+        if plot_output:
+            visualizer = Visualizer()
         
         import copy
         
@@ -182,9 +199,10 @@ class TwoPlayerGameTrainer:
         win_rates = []
 
         for i in range(iteration):
-            print(f"\nIteration {i+1}")
+            if not plot_output:
+                print(f"\nIteration {i+1}")
             history, n_win = TwoPlayerGameTrainer.play_and_train(
-                env=env, agent1=agent_new, agent2=agent_old, n_games = n_games, learn=True
+                env=env, agent1=agent_new, agent2=agent_old, n_games = n_games, learn=True, verbose=False
             )
 
             # Record win rates
@@ -194,9 +212,32 @@ class TwoPlayerGameTrainer:
             agent_old = copy.deepcopy(agent_new)
 
             # Notify winning rate
-            print(f"Winning rate: {n_win}")
+            if plot_output:
+                visualizer.plot_win_rates(win_rates)
+            else:
+                print(f"Winning rate: {n_win}")
 
         return agent_new, win_rates
+
+
+class Visualizer:
+    
+    @staticmethod
+    def plot_win_rates(win_rates):
+        _ = display.clear_output(wait=True)
+        _ = display.display(plt.gcf())
+        _ = plt.figure(figsize=(6, 4), dpi=80)
+        _ = plt.clf()
+        _ = plt.title('Self Play...')
+        _ = plt.xlabel('Number of Games')
+        _ = plt.ylabel('Score')
+        _ = plt.plot(np.arange(1, len(win_rates)+1), win_rates)
+        _ = plt.xlim(xmin=1, xmax=len(win_rates)+1)
+        _ = plt.ylim(ymin=0)
+        _ = plt.text(len(win_rates), win_rates[-1], str(win_rates[-1]))
+        _ = plt.legend(["Winning rate"])
+        _ = plt.grid()
+        _ = plt.show()
 
 
 if __name__ == "__main__":
