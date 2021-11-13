@@ -26,6 +26,4 @@ get_possible_action -> Method to get possible actions in a current state
  * Tabular QLearning Agent
  * Tabular Expected Sarsa Agent
 
-To view the training process, see train.ipynb
-
-**Future instruction coming soon**
+To view the training process, training_RL_Agent.ipynb 
