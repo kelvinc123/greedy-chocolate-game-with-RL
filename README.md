@@ -10,7 +10,10 @@ The game is currently set with 3 boxes of chocolates. Each box has a random numb
  * vs random agent (behaves randomly): `python vs_agent --random`
  * vs best agent: `python vs_agent --best`
 
-### Environment:
+### Training Process
+To view the training process, see training_RL_Agent.ipynb
+
+### Gym Environment:
 The gym environment class is available in environment.py. 
 
 Methods:
@@ -26,5 +29,5 @@ get_possible_action -> Method to get possible actions in a current state
  * Tabular QLearning Agent
  * Tabular Expected Sarsa Agent
 
-### Training Data
-To view the training process, see training_RL_Agent.ipynb
+### Requirements:
+There is no **requirements.txt** file since the only required package is numpy
