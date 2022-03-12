@@ -6,12 +6,12 @@ can't take chocolate more than the amount of chocolate in a chosen box. Whoever 
 
 ### Play the game:
 The game is currently set with 3 boxes of chocolates. Each box has a random number of chocolates between 3 and 20.
- * 2 players: python game.py
- * vs random agent: python vs_agent --random
- * vs best agent: python vs_agent --best
+ * 2 players: `python game.py`
+ * vs random agent (behaves randomly): `python vs_agent --random`
+ * vs best agent: `python vs_agent --best`
 
 ### Environment:
-The environment class is available in environment.py. 
+The gym environment class is available in environment.py. 
 
 Methods:
 ```
@@ -26,4 +26,5 @@ get_possible_action -> Method to get possible actions in a current state
  * Tabular QLearning Agent
  * Tabular Expected Sarsa Agent
 
+### Training Data
 To view the training process, see training_RL_Agent.ipynb
