@@ -11,10 +11,10 @@ The game is currently set with 3 boxes of chocolates. Each box has a random numb
  * vs best agent: `python vs_agent --best`
 
 ### Training Process
-To view the training process, see training_RL_Agent.ipynb
+To view the training process, see *training_RL_Agent.ipynb*.
 
 ### Gym Environment:
-The gym environment class is available in environment.py. 
+The gym environment class is available in *environment.py*. 
 
 Methods:
 ```
@@ -30,4 +30,4 @@ get_possible_action -> Method to get possible actions in a current state
  * Tabular Expected Sarsa Agent
 
 ### Requirements:
-There is no **requirements.txt** file since the only required package is numpy
+There is no *requirements.txt* file since the only required package is `numpy`
